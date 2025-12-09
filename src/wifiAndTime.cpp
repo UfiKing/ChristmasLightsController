@@ -3,50 +3,6 @@
 #include <time.h>
 #include <ESPAsyncWebServer.h>
 
-/*
-class WebHandler{
-  char* ssid; // max 33
-  char* password; // max 63
-  
-  char* APssid = "9mDolgaKitaObdanaZLuckami";
-  char* APpassword = "Geslo123!";
-
-  const char ntpServer[15] = "ntp2.arnes.si";
-  const uint16_t GMT_Offset = 3600;
-  const uint16_t DaylightSavings_Offset = 3600;
-
-  bool isWifiOn = false;
-  public:
-  
-  WebHandler(){
-    LittleFS.begin();
-  }
-  
-  int configTimeServer();
-
-  void getTime(); 
-
-  void setFileFromVariable(char var[], char path[]); 
-
-  void setVariableFromFile(char var[], char path[]);
-
-  void setSSID(char* newSSID);
-
-  void setPassword(char newPassword[]);
-
-  void setAPssid(char newSSID[]);
-
-  void setAPpassword(char newPassword[]);
-
-  void setWifiCredentials();
-  
-  void getWifiCredentials();
-
-  void setupWifi();  
-  
-  void setupAP();
-  
-};*/
 
 int WebHandler::configTimeServer(){
   if(WebHandler::isWifiOn == false){

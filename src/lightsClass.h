@@ -2,6 +2,6 @@
 #define LIGHTS_CLASS_H
 
 
-class LightsHandler();
+class LightsHandler;
 
 #endif
