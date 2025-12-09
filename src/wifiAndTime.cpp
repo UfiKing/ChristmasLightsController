@@ -3,13 +3,13 @@
 #include <time.h>
 #include <ESPAsyncWebServer.h>
 
-
+/*
 class WebHandler{
-  char ssid[33];
-  char password[63];
+  char* ssid; // max 33
+  char* password; // max 63
   
-  char APssid[33] = "9mDolgaKitaObdanaZLuckami";
-  char APpassword[63] = "Geslo123!";
+  char* APssid = "9mDolgaKitaObdanaZLuckami";
+  char* APpassword = "Geslo123!";
 
   const char ntpServer[15] = "ntp2.arnes.si";
   const uint16_t GMT_Offset = 3600;
@@ -21,7 +21,7 @@ class WebHandler{
   WebHandler(){
     LittleFS.begin();
   }
-
+  
   int configTimeServer();
 
   void getTime(); 
@@ -29,7 +29,15 @@ class WebHandler{
   void setFileFromVariable(char var[], char path[]); 
 
   void setVariableFromFile(char var[], char path[]);
-  
+
+  void setSSID(char* newSSID);
+
+  void setPassword(char newPassword[]);
+
+  void setAPssid(char newSSID[]);
+
+  void setAPpassword(char newPassword[]);
+
   void setWifiCredentials();
   
   void getWifiCredentials();
@@ -38,7 +46,7 @@ class WebHandler{
   
   void setupAP();
   
-};
+};*/
 
 int WebHandler::configTimeServer(){
   if(WebHandler::isWifiOn == false){
@@ -104,6 +112,22 @@ void WebHandler::setVariableFromFile(char var[], char path[]){
   Serial.println("Variable written successfully");
   file.close();
   Serial.println("File closed successfully");
+}
+
+void WebHandler::setSSID(char* newSSID){
+  WebHandler::ssid = newSSID;
+}
+
+void WebHandler::setPassword(char newPassword[]){
+  WebHandler::password = newPassword;
+}
+
+void WebHandler::setAPssid(char newSSID[]){
+  WebHandler::APssid = newSSID;
+}
+
+void WebHandler::setAPpassword(char newPassword[]){
+  WebHandler::APpassword = newPassword;
 }
 
 void WebHandler::setWifiCredentials(){
