@@ -8,7 +8,6 @@
 #include "lightsClass.h"
 
 
-
 const char* ssidInput = "SSIDInput";
 const char* passwordInput = "PASSWORDInput";
 
@@ -31,9 +30,9 @@ String processor(const String& var){
 }
 char a[64];
 void setup(){
-  //WebHandler.setupAP();
   WebHandler.getWifiCredentials();
   WebHandler.setupWifi();
+  Serial.begin(9600);
   
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
       request->send(LittleFS, "/index.html", "",false, processor);
@@ -45,8 +44,6 @@ void setup(){
       });
 
   server.on("/get", HTTP_GET, [](AsyncWebServerRequest *request){
-      
-
       if(request->hasParam(ssidInput)){
         inputMessage = request->getParam(ssidInput)->value();
         strcpy(WebHandler.ssid, inputMessage.c_str());
@@ -82,7 +79,7 @@ void setup(){
       WebHandler.setupWifi();
       request->send(LittleFS, "/index.html", "", false, processor);
       });
-  
+
   server.on("/setupAP", HTTP_GET, [](AsyncWebServerRequest *request){
       request->send(LittleFS, "/setupAP.html", "", false, processor);
       });
