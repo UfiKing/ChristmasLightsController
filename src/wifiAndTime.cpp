@@ -4,33 +4,55 @@
 #include <ESPAsyncWebServer.h>
 
 
-class WebHandler(){
+class WebHandler{
   char ssid[33];
   char password[63];
+  
+  char APssid[33] = "9mDolgaKitaObdanaZLuckami";
+  char APpassword[63] = "Geslo123!";
 
-  const char ntpServer = "ntp2.arnes.si";
+  const char ntpServer[15] = "ntp2.arnes.si";
   const uint16_t GMT_Offset = 3600;
   const uint16_t DaylightSavings_Offset = 3600;
 
-
+  bool isWifiOn = false;
   public:
   
   WebHandler(){
     LittleFS.begin();
   }
 
-  uint8_t configTimeServer(){
-    if(isWifiOn == false){
-      Serial.println("Not connected to wifi!");
-      return 1;
-    }
-    configTime(GMT_Offset, DaylightSavings_Offset, ntpServer);
-    return 0;
-  }
+  int configTimeServer();
 
-  void getTime(){
+  void getTime(); 
+
+  void setFileFromVariable(char var[], char path[]); 
+
+  void setVariableFromFile(char var[], char path[]);
+  
+  void setWifiCredentials();
+  
+  void getWifiCredentials();
+
+  void setupWifi();  
+  
+  void setupAP();
+  
+};
+
+int WebHandler::configTimeServer(){
+  if(WebHandler::isWifiOn == false){
+    Serial.println("Not connected to wifi!");
+    return 1;
+  }
+  configTime(WebHandler::GMT_Offset, WebHandler::DaylightSavings_Offset, WebHandler::ntpServer);
+  return 0;
+}
+
+
+void WebHandler::getTime(){
     
-    if(configTimeServer() == 1){
+    if(WebHandler::configTimeServer() == 1){
       return;
     }
 
@@ -41,102 +63,80 @@ class WebHandler(){
     Serial.println(timeInfo.tm_min);
   }
 
-  void setFileFromVariable(char path[], char var[]){
-    File file = LittleFS.open(path, "w");
+void WebHandler::setFileFromVariable(char var[], char path[]){
+  File file = LittleFS.open(path, "w");
 
-    if(!file){
-      Serial.print("File ");
-      Serial.print(path);
-      Serial.println(" opened unsuccessfully");
-    }
-  }
-
-}
-
-
-void setWifiCredentials(FS &fs, char ssid[], char password[]){
-  File file = fs.open("/ssid.txt", "w");
+  Serial.print("File ");
+  Serial.print(path);
 
   if(!file){
-    Serial.println("ohno not worky (file ssid.txt couldnt be opened)");
+    Serial.println(" opened unsuccessfully, aborting any further writing");
     return;
   }
-  if(file.print(ssid)){
-    Serial.println("file written successfully");
-  }else{
-    Serial.println("file written unsuccessfully, oopsie doopise");
+  Serial.println(" opened successfully");
 
+  if(file.print(var)){
+    Serial.println("File written successfully");
+  }else{
+    Serial.println("File written unsuccessfully");
   }
+
   file.close();
-  delay(100);
-  File file2 = fs.open("/pass.txt", "w");
-  if(!file2){
-    Serial.println("ohno not worky (file pass.txt couldnt be opened)");
-    return;
-  }
-  if(file2.print(password)){
-    Serial.println("file written successfully");
-  }else{
-    Serial.println("file written unsuccessfully, oopsie doopise");
 
-  }
-  file2.close();
 }
 
-void getWifiCredentials(FS &fs, char ssid[], char password[]){
-  File file = fs.open("/ssid.txt");
+void WebHandler::setVariableFromFile(char var[], char path[]){
+  File file = LittleFS.open(path, "w");
+
+  Serial.print("File ");
+  Serial.print(path);
   if(!file){
-    Serial.println("ohno not worky (file ssid.txt couldnt be opened)");
+    Serial.println(" opened unsuccessfully, aborting any further writing");
     return;
   }
-  //ssid = file.read();
+  Serial.println(" opened successfully");
+    
   uint8_t i = 0;
-  while(file.available()) ssid[i++] = (char)file.read();
-  while(ssid[i++] != '\0' || ssid[i] != 0) ssid[i] = '\0';
-  Serial.println(ssid);
-  
+  while(file.available()) var[i++] = (char)file.read();
+  i = 0;
+  while(var[i++] != '\0' || var[i] != 0) var[i] = '\0';
+   
+  Serial.println("Variable written successfully");
   file.close();
-  File file2 = fs.open("/pass.txt");
-  if (!file2){
-    Serial.println("ohno not worky (file pass.txt couldnt be opened)");
-    return;
-  }
-  //password = file2.read();
-  Serial.println(file2.read());
-
-  file2.close();
-
+  Serial.println("File closed successfully");
 }
 
-void setupWifi(char ssid[], char password[]){
+void WebHandler::setWifiCredentials(){
+  WebHandler::setFileFromVariable(ssid, "/ssid.txt" );
+  WebHandler::setFileFromVariable(password, "/pass.txt");
+}
+
+void WebHandler::getWifiCredentials(){
+  WebHandler::setVariableFromFile(ssid, "/ssid.txt");
+  WebHandler::setVariableFromFile(password, "pass.txt");
+}
+
+void WebHandler::setupWifi(){
   //connect to wifi
   Serial.println("Setting up wifi");
   WiFi.mode(WIFI_STA);
-  WiFi.begin(ssid, password);
+  WiFi.begin(WebHandler::ssid, WebHandler::password);
   while(WiFi.status() != WL_CONNECTED){
     delay(500);
     Serial.println("Connecting to wifi");
 
   }
-  isWifiOn = true; 
+  WebHandler::isWifiOn = true; 
   Serial.println(WiFi.localIP());
 
 }
 
-
-void setupAP(){
+void WebHandler::setupAP(){
   Serial.println("Setting up AP mode");
   WiFi.mode(WIFI_AP);
-  WiFi.softAP(APssid, APpassword);
-  isWifiOn = false;
+  WiFi.softAP(WebHandler::APssid, WebHandler::APpassword);
+  WebHandler::isWifiOn = false;
   Serial.println(WiFi.softAPIP());
 }
-
-
-
-
-
-
-
 
 
