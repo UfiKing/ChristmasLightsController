@@ -1,0 +1,48 @@
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>WIFI SETTINGS</title>
+  <style>
+  body{
+    background-color: hotpink;
+    font-family: "Comic Sans MS", "Comic Sans", cursive;
+    color: cyan;
+  }
+  button{
+    background-color: darkmagenta;
+    color: hotpink;
+  }
+  h4{
+    color:red;
+  }
+
+  </style>
+  </head>
+  <body>
+  <h1>WIFI SETUP</h1>
+
+  <form action="/get">
+    ssid : <input type="text" name="SSIDInput">
+    <br> 
+    <br> 
+    <input type="submit" value="SUBMIT SSID">
+  </form><br>
+
+  <form action="/get">
+    password : <input type="text" name="PASSWORDInput">
+    <br>
+    <br> 
+    <input type="submit" value="SUBMIT PASSWORD">
+  </form>
+
+
+
+  <h4>WARNING &darr; THIS &darr; WILL SAVE THE SSID AND PASSWORD INTO PREFERENCES</h4>
+  <a href="/connectToWifi"><button>CONNECT WITH INPUTED SETTINGS</button></a>
+  <h4>WARNING &uarr; THIS &uarr; WILL SAVE THE SSID AND PASSWORD INTO PREFERENCES
+  <br>
+  <br>
+  <br>
+  <a href="/connectToWifiPREFERENCES"><button>CONNECT WITH SAVED SETTINGS</button></a>
+  </body>
+</html>
