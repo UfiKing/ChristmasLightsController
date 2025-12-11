@@ -5,6 +5,9 @@
 #include <LittleFS.h>
 #include <time.h>
 #include "wifiAndTime.h"
+#include "lightsClass.h"
+
+
 
 const char* ssidInput = "SSIDInput";
 const char* passwordInput = "PASSWORDInput";
@@ -12,47 +15,53 @@ const char* passwordInput = "PASSWORDInput";
 const char* APssidInput = "AP_SSIDInput";
 const char* APpasswordInput = "AP_PASSWORDInput";
 
-bool isWifiOn = false;
+//bool isWifiOn = false;
 
 WebHandler WebHandler;
 
+LightsHandler LightsHandler;
+
 AsyncWebServer server(80);
+
+String inputMessage;
+String inputParam;
 
 String processor(const String& var){
   return String();
 }
-
-
+char a[64];
 void setup(){
-  Serial.begin(9600);
-
+  //WebHandler.setupAP();
+  WebHandler.getWifiCredentials();
+  WebHandler.setupWifi();
+  
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
       request->send(LittleFS, "/index.html", "",false, processor);
       });
   server.on("/button1", HTTP_GET, [](AsyncWebServerRequest *request){
       Serial.println("buton");
+      LightsHandler.state = !LightsHandler.state;
       request->send(LittleFS, "/index.html", "",false, processor);
       });
 
   server.on("/get", HTTP_GET, [](AsyncWebServerRequest *request){
-      String inputMessage;
-      String inputParam;
+      
 
       if(request->hasParam(ssidInput)){
         inputMessage = request->getParam(ssidInput)->value();
-        WebHandler.setSSID((char*)inputMessage.c_str());
+        strcpy(WebHandler.ssid, inputMessage.c_str());
+        WebHandler.setFileFromVariable(WebHandler.ssid, "/ssid.txt");
       }
       else if(request->hasParam(passwordInput)){
         inputMessage = request->getParam(passwordInput)->value();
-        WebHandler.setPassword((char*)inputMessage.c_str());
+        strcpy(WebHandler.password, inputMessage.c_str());
+        WebHandler.setFileFromVariable(WebHandler.password, "/ssid.txt");
       }
       else if(request->hasParam(APssidInput)){
         inputMessage = request->getParam(APssidInput)->value();
-        WebHandler.setAPssid((char*)inputMessage.c_str());
       }
       else if(request->hasParam(APpasswordInput)){
         inputMessage = request->getParam(APpasswordInput)->value();
-        WebHandler.setAPpassword((char*)inputMessage.c_str());
       }
       request->send(200, "/", "");
       });
@@ -62,7 +71,7 @@ void setup(){
       });
 
   server.on("/connectToWifi", HTTP_GET, [](AsyncWebServerRequest *request){
-      WebHandler.setWifiCredentials();
+      WebHandler.getWifiCredentials();
       WebHandler.setupWifi();
       WebHandler.getTime();
       request->send(LittleFS, "/index.html", "", false, processor);
@@ -88,7 +97,11 @@ void setup(){
 
 
 void loop(){
-
+  if(LightsHandler.state){
+    LightsHandler.rainbowEffect1();
+  }else{
+    LighsHandler.lightsOff();
+  }
 }
 
 

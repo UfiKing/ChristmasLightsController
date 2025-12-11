@@ -5,10 +5,10 @@
 
 
 class WebHandler{
-  char* ssid; // max 33
-  char* password; // max 63
   
-  char* APssid = "9mDolgaKitaObdanaZLuckami";
+  
+  //char* APssid = "9mDolgaKitaObdanaZLuckami";
+  char* APssid = "luckeee";
   char* APpassword = "Geslo123!";
 
   const char* ntpServer = "arnes2.ntp.si";
@@ -18,25 +18,34 @@ class WebHandler{
   bool isWifiOn = false;
   public:
   
+  char ssid[33]; // max 33
+  char password[63]; // max 63
+  
   WebHandler(){
-    LittleFS.begin();
+    Serial.begin(9600);
+    Serial.println("Starting file sistem!");
+    if(LittleFS.begin()){
+      Serial.println("filesystem started successfully!");
+    }else{
+      Serial.println("filesystem didn't start successfully ):");
+    }
   }
 
   int configTimeServer();
 
   void getTime(); 
 
-  void setFileFromVariable(char var[], char path[]); 
+  void setFileFromVariable(char var[], char* path, bool first = true); 
 
   void setVariableFromFile(char var[], char path[]);
 
-  void setSSID(char* newSSID);
+  /*void setSSID(char newSSID[]);
 
   void setPassword(char newPassword[]);
 
   void setAPssid(char newSSID[]);
 
-  void setAPpassword(char newPassword[]);
+  void setAPpassword(char newPassword[]);*/
 
   void setWifiCredentials();
   

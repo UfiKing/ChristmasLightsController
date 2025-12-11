@@ -2,7 +2,7 @@
 #include <WiFi.h>
 #include <time.h>
 #include <ESPAsyncWebServer.h>
-
+#define CONFIG_ASYNC_TCP_USE_WDT 1
 
 int WebHandler::configTimeServer(){
   if(WebHandler::isWifiOn == false){
@@ -15,19 +15,19 @@ int WebHandler::configTimeServer(){
 
 
 void WebHandler::getTime(){
-    
-    if(WebHandler::configTimeServer() == 1){
-      return;
-    }
-
-    struct tm timeInfo;
-    getLocalTime(&timeInfo);
-    Serial.print(timeInfo.tm_hour);
-    Serial.print("  ");
-    Serial.println(timeInfo.tm_min);
+  configTime(WebHandler::GMT_Offset, WebHandler::DaylightSavings_Offset, WebHandler::ntpServer);
+  if(WebHandler::configTimeServer() == 1){
+    return;
   }
 
-void WebHandler::setFileFromVariable(char var[], char path[]){
+  struct tm timeInfo;
+  getLocalTime(&timeInfo);
+  Serial.print(timeInfo.tm_hour);
+  Serial.print("  ");
+  Serial.println(timeInfo.tm_min);
+  }
+
+void WebHandler::setFileFromVariable(char var[], char* path, bool first){
   File file = LittleFS.open(path, "w");
 
   Serial.print("File ");
@@ -38,19 +38,25 @@ void WebHandler::setFileFromVariable(char var[], char path[]){
     return;
   }
   Serial.println(" opened successfully");
-
+  
   if(file.print(var)){
-    Serial.println("File written successfully");
+    Serial.print(var);
+    Serial.println(" written successfully");
   }else{
-    Serial.println("File written unsuccessfully");
+    Serial.print(var);
+    Serial.println(" written unsuccessfully");
+    if(first){
+      file.close();
+      this->setFileFromVariable(var,path,false);
+    } 
   }
-
+  Serial.println(file.read());
   file.close();
 
 }
 
 void WebHandler::setVariableFromFile(char var[], char path[]){
-  File file = LittleFS.open(path, "w");
+  File file = LittleFS.open(path);
 
   Serial.print("File ");
   Serial.print(path);
@@ -61,21 +67,33 @@ void WebHandler::setVariableFromFile(char var[], char path[]){
   Serial.println(" opened successfully");
     
   uint8_t i = 0;
-  while(file.available()) var[i++] = (char)file.read();
+  //while(file.available()) var[i++] = (char)file.read();
+  
+  while(file.available()){ 
+    var[i] = file.read();
+    Serial.print((int)var[i]);
+    Serial.print(" ");
+    Serial.println((char)var[i]);
+    i++;
+  }
   i = 0;
-  while(var[i++] != '\0' || var[i] != 0) var[i] = '\0';
+  //while(var[i++] != '\0' || var[i] != 0) var[i] = '\0';
    
   Serial.println("Variable written successfully");
   file.close();
   Serial.println("File closed successfully");
 }
 
-void WebHandler::setSSID(char* newSSID){
+/*void WebHandler::setSSID(char newSSID[]){
   WebHandler::ssid = newSSID;
+  Serial.println(WebHandler::ssid);
+  Serial.println(newSSID);
 }
 
 void WebHandler::setPassword(char newPassword[]){
   WebHandler::password = newPassword;
+
+  Serial.println(WebHandler::password);
 }
 
 void WebHandler::setAPssid(char newSSID[]){
@@ -84,21 +102,26 @@ void WebHandler::setAPssid(char newSSID[]){
 
 void WebHandler::setAPpassword(char newPassword[]){
   WebHandler::APpassword = newPassword;
-}
+}*/
 
 void WebHandler::setWifiCredentials(){
-  WebHandler::setFileFromVariable(ssid, "/ssid.txt" );
-  WebHandler::setFileFromVariable(password, "/pass.txt");
+  Serial.println("setting the wifi credentials");
+  Serial.println(WebHandler::ssid);
+  WebHandler::setFileFromVariable(WebHandler::ssid, "/ssid.txt" );
+  WebHandler::setFileFromVariable(WebHandler::password, "/pass.txt");
 }
 
 void WebHandler::getWifiCredentials(){
-  WebHandler::setVariableFromFile(ssid, "/ssid.txt");
-  WebHandler::setVariableFromFile(password, "pass.txt");
+  WebHandler::setVariableFromFile(WebHandler::ssid, "/ssid.txt");
+  WebHandler::setVariableFromFile(WebHandler::password, "/pass.txt");
 }
 
 void WebHandler::setupWifi(){
   //connect to wifi
   Serial.println("Setting up wifi");
+  Serial.println(WebHandler::ssid);
+  Serial.println(WebHandler::password);
+
   WiFi.mode(WIFI_STA);
   WiFi.begin(WebHandler::ssid, WebHandler::password);
   while(WiFi.status() != WL_CONNECTED){
