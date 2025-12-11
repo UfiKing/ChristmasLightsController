@@ -97,7 +97,7 @@ void loop(){
   if(LightsHandler.state){
     LightsHandler.rainbowEffect1();
   }else{
-    LighsHandler.lightsOff();
+    LightsHandler.lightsOff();
   }
 }
 
