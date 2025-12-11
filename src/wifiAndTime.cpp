@@ -2,30 +2,38 @@
 #include <WiFi.h>
 #include <time.h>
 #include <ESPAsyncWebServer.h>
-#define CONFIG_ASYNC_TCP_USE_WDT 1
 
 int WebHandler::configTimeServer(){
   if(WebHandler::isWifiOn == false){
     Serial.println("Not connected to wifi!");
     return 1;
   }
+  Serial.println("Connected to wifi!");
+  Serial.print("GMT_Offset: ");
+  Serial.println(WebHandler::GMT_Offset);
+  Serial.print("DaylightSavings_Offset: ");
+  Serial.println(WebHandler::DaylightSavings_Offset);
+  Serial.print("ntp server: ");
+  Serial.println(WebHandler::ntpServer);
   configTime(WebHandler::GMT_Offset, WebHandler::DaylightSavings_Offset, WebHandler::ntpServer);
+  WebHandler::isWifiOn = true;
   return 0;
 }
 
 
 void WebHandler::getTime(){
-  configTime(WebHandler::GMT_Offset, WebHandler::DaylightSavings_Offset, WebHandler::ntpServer);
-  if(WebHandler::configTimeServer() == 1){
+  //configTime(WebHandler::GMT_Offset, WebHandler::DaylightSavings_Offset, WebHandler::ntpServer);
+  /*if(WebHandler::configTimeServer() == 1){
     return;
-  }
-
-  struct tm timeInfo;
+  }*/
+  if(!WebHandler::isWifiOn) return;
   getLocalTime(&timeInfo);
-  Serial.print(timeInfo.tm_hour);
-  Serial.print("  ");
-  Serial.println(timeInfo.tm_min);
-  }
+  //Serial.print(timeInfo.tm_hour);
+  WebHandler::hours = timeInfo.tm_hour;
+  //Serial.print("  ");
+  //Serial.println(timeInfo.tm_min);
+  WebHandler::minutes = timeInfo.tm_min;
+}
 
 void WebHandler::setFileFromVariable(char var[], char* path, bool first){
   File file = LittleFS.open(path, "w");

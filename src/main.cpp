@@ -28,10 +28,16 @@ String inputParam;
 String processor(const String& var){
   return String();
 }
-char a[64];
+
 void setup(){
   WebHandler.getWifiCredentials();
-  WebHandler.setupWifi();
+  if(*WebHandler.ssid == '\n' || *WebHandler.password == '\n'){
+    WebHandler.setupAP();
+  }else{
+    WebHandler.setupWifi();
+    WebHandler.configTimeServer();
+    WebHandler.getTime();
+  }
   Serial.begin(9600);
   
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
@@ -40,6 +46,7 @@ void setup(){
   server.on("/button1", HTTP_GET, [](AsyncWebServerRequest *request){
       Serial.println("buton");
       LightsHandler.state = !LightsHandler.state;
+      WebHandler.getTime();
       request->send(LittleFS, "/index.html", "",false, processor);
       });
 
@@ -52,7 +59,7 @@ void setup(){
       else if(request->hasParam(passwordInput)){
         inputMessage = request->getParam(passwordInput)->value();
         strcpy(WebHandler.password, inputMessage.c_str());
-        WebHandler.setFileFromVariable(WebHandler.password, "/ssid.txt");
+        WebHandler.setFileFromVariable(WebHandler.password, "/pass.txt");
       }
       else if(request->hasParam(APssidInput)){
         inputMessage = request->getParam(APssidInput)->value();
@@ -89,6 +96,23 @@ void setup(){
       request->send(LittleFS, "/setupAP.html", "", false, processor); 
       });
 
+  server.on("/manuelON", HTTP_GET, [](AsyncWebServerRequest *request){
+      WebHandler.manuelOverride = 1;
+      LightsHandler.state = true;
+      request->send(LittleFS, "/index.html", "", false, processor);
+      });
+
+  server.on("/manuelOFF", HTTP_GET, [](AsyncWebServerRequest *request){
+      WebHandler.manuelOverride = 0;
+      LightsHandler.state = false;
+      request->send(LittleFS, "/index.html", "", false, processor);
+      });
+
+  server.on("/auto", HTTP_GET, [](AsyncWebServerRequest *request){
+      WebHandler.manuelOverride = -1;
+      request->send(LittleFS, "/index.html", "", false, processor);
+      });
+
   server.begin(); 
 }
 
@@ -99,6 +123,19 @@ void loop(){
   }else{
     LightsHandler.lightsOff();
   }
+  //delay(10);
+  WebHandler.getTime(); 
+  delay(10);
+  if(330 <= (WebHandler.hours * 60) + WebHandler.minutes && (WebHandler.hours * 60) + WebHandler.minutes <= 450){
+    LightsHandler.state = true;
+  //}else if( 960 <= (WebHandler.hours * 60) + WebHandler.minutes && (WebHandler.hours * 60) + WebHandler.minutes <= 1320){
+  //
+  }else if( 960 <= (WebHandler.hours * 60) + WebHandler.minutes && (WebHandler.hours * 60) + WebHandler.minutes <= 1320){
+    LightsHandler.state = true;
+  }else if (WebHandler.manuelOverride == -1){
+    LightsHandler.state = false;
+    delay(1000);
+  }  
 }
 
 

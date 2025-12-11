@@ -11,16 +11,22 @@ class WebHandler{
   char* APssid = "luckeee";
   char* APpassword = "Geslo123!";
 
-  const char* ntpServer = "arnes2.ntp.si";
+  const char* ntpServer = "ntp1.arnes.si";
   const uint16_t GMT_Offset = 3600;
   const uint16_t DaylightSavings_Offset = 3600;
 
   bool isWifiOn = false;
   public:
   
+  struct tm timeInfo;
   char ssid[33]; // max 33
   char password[63]; // max 63
   
+  uint8_t hours = 0;
+  uint8_t minutes = 0;
+
+  int8_t manuelOverride = -1;
+
   WebHandler(){
     Serial.begin(9600);
     Serial.println("Starting file sistem!");
