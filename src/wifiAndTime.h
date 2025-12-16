@@ -8,8 +8,7 @@ class WebHandler{
   
   
   //char* APssid = "9mDolgaKitaObdanaZLuckami";
-  char* APssid = "luckeee";
-  char* APpassword = "Geslo123!";
+  
 
   const char* ntpServer = "ntp1.arnes.si";
   const uint16_t GMT_Offset = 3600;
@@ -21,6 +20,8 @@ class WebHandler{
   struct tm timeInfo;
   char ssid[33]; // max 33
   char password[63]; // max 63
+  char APssid[33] = "luckeee";
+  char APpassword[63] = "Geslo123!";
   
   uint8_t hours = 0;
   uint8_t minutes = 0;

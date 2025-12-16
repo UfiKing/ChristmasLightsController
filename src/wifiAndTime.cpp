@@ -92,26 +92,6 @@ void WebHandler::setVariableFromFile(char var[], char path[]){
   Serial.println("File closed successfully");
 }
 
-/*void WebHandler::setSSID(char newSSID[]){
-  WebHandler::ssid = newSSID;
-  Serial.println(WebHandler::ssid);
-  Serial.println(newSSID);
-}
-
-void WebHandler::setPassword(char newPassword[]){
-  WebHandler::password = newPassword;
-
-  Serial.println(WebHandler::password);
-}
-
-void WebHandler::setAPssid(char newSSID[]){
-  WebHandler::APssid = newSSID;
-}
-
-void WebHandler::setAPpassword(char newPassword[]){
-  WebHandler::APpassword = newPassword;
-}*/
-
 void WebHandler::setWifiCredentials(){
   Serial.println("setting the wifi credentials");
   Serial.println(WebHandler::ssid);
@@ -129,7 +109,7 @@ void WebHandler::setupWifi(){
   Serial.println("Setting up wifi");
   Serial.println(WebHandler::ssid);
   Serial.println(WebHandler::password);
-
+  WebHandler::getWifiCredentials();
   WiFi.mode(WIFI_STA);
   WiFi.begin(WebHandler::ssid, WebHandler::password);
   while(WiFi.status() != WL_CONNECTED){
@@ -144,6 +124,8 @@ void WebHandler::setupWifi(){
 
 void WebHandler::setupAP(){
   Serial.println("Setting up AP mode");
+  WebHandler::setVariableFromFile(WebHandler::APssid, "/APssid.txt");
+  WebHandler::setVariableFromFile(WebHandler::APpassword, "/APpass.txt");
   WiFi.mode(WIFI_AP);
   WiFi.softAP(WebHandler::APssid, WebHandler::APpassword);
   WebHandler::isWifiOn = false;

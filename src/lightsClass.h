@@ -4,11 +4,11 @@
 #define LED_PIN 18
 
 class LightsHandler{
-  uint8_t brightness = 10;
   uint8_t hue = 0;  
   const uint16_t numLeds = 399;
   CRGB leds[399];
   public: 
+  uint8_t brightness = 10;
 
   bool state = false;
   LightsHandler(){

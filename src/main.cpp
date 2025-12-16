@@ -14,8 +14,6 @@ const char* passwordInput = "PASSWORDInput";
 const char* APssidInput = "AP_SSIDInput";
 const char* APpasswordInput = "AP_PASSWORDInput";
 
-//bool isWifiOn = false;
-
 WebHandler WebHandler;
 
 LightsHandler LightsHandler;
@@ -63,9 +61,16 @@ void setup(){
       }
       else if(request->hasParam(APssidInput)){
         inputMessage = request->getParam(APssidInput)->value();
+        strcpy(WebHandler.APssid, inputMessage.c_str());
+        WebHandler.setFileFromVariable(WebHandler.APssid, "/APssid.txt");
       }
       else if(request->hasParam(APpasswordInput)){
         inputMessage = request->getParam(APpasswordInput)->value();
+        strcpy(WebHandler.APpassword, inputMessage.c_str());
+        WebHandler.setFileFromVariable(WebHandler.APpassword, "/APpass.txt");
+      }else if(request->hasParam("BRIGHTNESS_Input")){
+        inputMessage = request->getParam("BRIGHTNESS_Input")->value();
+        LightsHandler.brightness = inputMessage.toInt();
       }
       request->send(200, "/", "");
       });
@@ -123,13 +128,11 @@ void loop(){
   }else{
     LightsHandler.lightsOff();
   }
-  //delay(10);
   WebHandler.getTime(); 
   delay(10);
   if(330 <= (WebHandler.hours * 60) + WebHandler.minutes && (WebHandler.hours * 60) + WebHandler.minutes <= 450){
     LightsHandler.state = true;
   //}else if( 960 <= (WebHandler.hours * 60) + WebHandler.minutes && (WebHandler.hours * 60) + WebHandler.minutes <= 1320){
-  //
   }else if( 960 <= (WebHandler.hours * 60) + WebHandler.minutes && (WebHandler.hours * 60) + WebHandler.minutes <= 1320){
     LightsHandler.state = true;
   }else if (WebHandler.manuelOverride == -1){
