@@ -29,6 +29,7 @@ String processor(const String& var){
 
 void setup(){
   WebHandler.getWifiCredentials();
+  WebHandler.setFileFromVariable(WebHandler.APpassword, "/APpass.txt");
   if(*WebHandler.ssid == '\n' || *WebHandler.password == '\n'){
     WebHandler.setupAP();
   }else{
@@ -70,7 +71,7 @@ void setup(){
         WebHandler.setFileFromVariable(WebHandler.APpassword, "/APpass.txt");
       }else if(request->hasParam("BRIGHTNESS_Input")){
         inputMessage = request->getParam("BRIGHTNESS_Input")->value();
-        LightsHandler.brightness = inputMessage.toInt();
+        LightsHandler.changeBrightness( inputMessage.toInt());
       }
       request->send(200, "/", "");
       });
@@ -125,6 +126,7 @@ void setup(){
 void loop(){
   if(LightsHandler.state){
     LightsHandler.rainbowEffect1();
+    LightsHandler.resetBrightness();
   }else{
     LightsHandler.lightsOff();
   }
@@ -132,13 +134,16 @@ void loop(){
   delay(10);
   if(330 <= (WebHandler.hours * 60) + WebHandler.minutes && (WebHandler.hours * 60) + WebHandler.minutes <= 450){
     LightsHandler.state = true;
-  //}else if( 960 <= (WebHandler.hours * 60) + WebHandler.minutes && (WebHandler.hours * 60) + WebHandler.minutes <= 1320){
   }else if( 960 <= (WebHandler.hours * 60) + WebHandler.minutes && (WebHandler.hours * 60) + WebHandler.minutes <= 1320){
     LightsHandler.state = true;
-  }else if (WebHandler.manuelOverride == -1){
+  }else if((120 <= (WebHandler.hours * 60) + WebHandler.minutes) && ((WebHandler.hours * 60) + WebHandler.minutes <= 122 ) && (WebHandler.manuelOverride == -1) ){
+    LightsHandler.specialBlink();
+    Serial.println(WebHandler.hours * 60 + WebHandler.minutes);
+  }
+  else if (WebHandler.manuelOverride == -1){
     LightsHandler.state = false;
     delay(1000);
-  }  
+  }
 }
 
 

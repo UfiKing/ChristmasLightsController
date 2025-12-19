@@ -30,7 +30,27 @@ void LightsHandler::rainbowEffect1(){
 }
 
 
+void LightsHandler::changeBrightness(uint8_t newBrightness){
+  this->brightness = newBrightness;
+  FastLED.setBrightness(this->brightness);
+}
 
+void LightsHandler::specialBlink(){
+  FastLED.setBrightness(255);
+  for(uint16_t i = 0; i< LightsHandler::numLeds; i++){
+    LightsHandler::leds[i] = CRGB(0xFE,0x00,0x80);
+  }
+  FastLED.show();
+  //delay(150);
+  delay(1000);
+  for(uint16_t i = 0; i< LightsHandler::numLeds; i++){
+    LightsHandler::leds[i] = CRGB(0x0,0x0,0x0);
+  }
+  FastLED.show();
+  delay(1000); 
+}
 
-
+void LightsHandler::resetBrightness(){
+  FastLED.setBrightness(LightsHandler::brightness);
+}
 

@@ -7,9 +7,9 @@ class LightsHandler{
   uint8_t hue = 0;  
   const uint16_t numLeds = 399;
   CRGB leds[399];
-  public: 
   uint8_t brightness = 10;
-
+  public: 
+  
   bool state = false;
   LightsHandler(){
     FastLED.addLeds<WS2812B, LED_PIN>(leds, numLeds);
@@ -21,6 +21,12 @@ class LightsHandler{
   void lightsOn();
 
   void rainbowEffect1();
+
+  void changeBrightness(uint8_t newBrightness);
+
+  void resetBrightness();
+
+  void specialBlink();
 
 };
 
